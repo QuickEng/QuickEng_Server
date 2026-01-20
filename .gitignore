@@ -9,6 +9,7 @@ __pycache__/
 
 # 환경 변수 (보안 중요!)
 .env
+.env.*
 
 # 운영체제 임시 파일
 .DS_Store
