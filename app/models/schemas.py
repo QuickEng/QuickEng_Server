@@ -33,7 +33,6 @@ class ScriptItem(BaseModel):
     # 파이썬: context_tag <---> 앱: contextTag
     context_tag: str = Field(..., alias="contextTag")
     
-    timestamp: int
 
     class Config:
         populate_by_name = True
