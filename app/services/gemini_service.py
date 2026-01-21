@@ -99,6 +99,7 @@ async def extract_vocabulary(transcript_list: list[dict]) -> list[dict]:
         
         return vocabulary_data
     
+    
     # ---------------------------------------------------------
     # 6. 예외 처리 (Error Handling)명세서 규격에 맞게 에러 발생시키기
     # ---------------------------------------------------------
