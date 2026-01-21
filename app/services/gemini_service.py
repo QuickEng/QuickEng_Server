@@ -5,6 +5,8 @@ import google.generativeai as genai
 from app.core.config import settings
 import json
 import uuid  # [1] 내장 라이브러리 추가 (고유 ID 생성용)
+# FastAPI의 HTTPException을 사용해 명세서 규격에 맞는 에러를 던지도록 수정
+from fastapi import HTTPException
 
 # =============================================================================
 # Gemini API 초기 설정
@@ -98,15 +100,26 @@ async def extract_vocabulary(transcript_list: list[dict]) -> list[dict]:
         return vocabulary_data
     
     # ---------------------------------------------------------
-    # 6. 예외 처리 (Error Handling)
+    # 6. 예외 처리 (Error Handling)명세서 규격에 맞게 에러 발생시키기
     # ---------------------------------------------------------
-    # 상황: AI가 JSON 형식이 아닌 그냥 줄글(예: "안녕하세요, 여기 단어입니다...")을 보냈을 때 json.loads에서 에러가 납니다.
-    # 프로그램이 멈추지 않게 "형식이 틀렸네요"라고 로그를 남기고, **빈 리스트([])**를 줘서 다음 단계가 문제없이 넘어가게 합니다.
     except json.JSONDecodeError:
-        print("Gemini Response Parse Error: JSON 형식이 아닙니다.")
-        return []
-    # 상황: 인터넷이 끊기거나, API 키가 틀리는 등 예상치 못한 다른 모든 에러가 발생했을 때입니다.
-    # 에러 내용을 출력해서 개발자가 알 수 있게 하고, 마찬가지로 빈 리스트를 반환하여 프로그램 셧다운을 막습니다.
+        # AI가 이상한 응답을 줬을 때 (분석 실패)
+        print("Gemini Response Parse Error")
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "code": "AI_PARSE_ERROR",
+                "message": "AI 분석 결과가 올바르지 않습니다. 다시 시도해주세요."
+            }
+        )
+
     except Exception as e:
+        # 그 외 모든 에러
         print(f"Gemini API Error: {e}")
-        return []
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "code": "UNKNOWN_ERROR",
+                "message": "알 수 없는 오류가 발생했습니다."
+            }
+        )
