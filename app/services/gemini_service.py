@@ -1,13 +1,17 @@
 """
 Google Gemini API를 이용한 요약 및 분석 서비스
 """
+import logging
 import google.generativeai as genai
 from app.core.config import settings
 import json
 import uuid  # [1] 내장 라이브러리 추가 (고유 ID 생성용)
 # FastAPI의 HTTPException을 사용해 명세서 규격에 맞는 에러를 던지도록 수정
 from fastapi import HTTPException
+from app.core.exceptions import AIParseException, AIUnknownException
 
+# 로거 설정
+logger = logging.getLogger(__name__)
 # =============================================================================
 # Gemini API 초기 설정
 # =============================================================================
@@ -100,27 +104,19 @@ async def extract_vocabulary(transcript_list: list[dict]) -> list[dict]:
         return vocabulary_data
     
     
-    # ---------------------------------------------------------
-    # 6. 예외 처리 (Error Handling)명세서 규격에 맞게 에러 발생시키기
+# ---------------------------------------------------------
+    # 6. 예외 처리 (Error Handling) - 표준화 적용 완료
     # ---------------------------------------------------------
     except json.JSONDecodeError:
-        # AI가 이상한 응답을 줬을 때 (분석 실패)
-        print("Gemini Response Parse Error")
-        raise HTTPException(
-            status_code=500,
-            detail={
-                "code": "AI_PARSE_ERROR",
-                "message": "AI 분석 결과가 올바르지 않습니다. 다시 시도해주세요."
-            }
-        )
+        # [로그] 개발자용: 실제 AI가 뱉은 이상한 텍스트 기록
+        logger.error(f"Gemini JSON 파싱 실패. 응답 내용: {result_text}")
+        
+        # [응답] 앱용: "AI_PARSE_ERROR" 표준 에러 던지기
+        raise AIParseException()
 
     except Exception as e:
-        # 그 외 모든 에러
-        print(f"Gemini API Error: {e}")
-        raise HTTPException(
-            status_code=500,
-            detail={
-                "code": "UNKNOWN_ERROR",
-                "message": "알 수 없는 오류가 발생했습니다."
-            }
-        )
+        # [로그] 개발자용: 실제 에러 내용 기록
+        logger.error(f"Gemini API 알 수 없는 오류: {str(e)}")
+        
+        # [응답] 앱용: "UNKNOWN_ERROR" 표준 에러 던지기
+        raise AIUnknownException()
