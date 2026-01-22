@@ -49,3 +49,11 @@ class YouTubeUnknownException(BusinessException):
             code="YOUTUBE_ERROR",
             message="유튜브 자막을 가져오는 중 오류가 발생했습니다."
         )
+
+#6. 유효하지 않은 유튜브 링크
+class InvalidLinkException(BusinessException):
+    def __init__(self):
+        super().__init__(
+            code="INVALID_LINK",
+            message="유효하지 않은 유튜브 링크입니다. URL을 확인해주세요."
+        )
