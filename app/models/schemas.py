@@ -23,6 +23,9 @@ class AnalyzeRequest(BaseModel):
 # 2. [내부 부품] 단어 카드 하나하나의 모양
 # =========================================================
 class WordItem(BaseModel):
+    # 카드의 고유 id
+    id: str
+
     # 이건 둘 다 똑같이 "expression"을 쓰니까 별명 설정 불필요
     expression: str
     
