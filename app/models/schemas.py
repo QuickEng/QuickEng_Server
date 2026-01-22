@@ -19,11 +19,10 @@ class AnalyzeRequest(BaseModel):
         # [설정] 별명(videoUrl)으로 들어와도 받고, 본명(video_url)으로 들어와도 받아준다.
         populate_by_name = True
 
-
 # =========================================================
 # 2. [내부 부품] 단어 카드 하나하나의 모양
 # =========================================================
-class ScriptItem(BaseModel):
+class WordItem(BaseModel):
     # 이건 둘 다 똑같이 "expression"을 쓰니까 별명 설정 불필요
     expression: str
     
@@ -57,3 +56,12 @@ class AnalyzeResponse(BaseModel):
 
     class Config:
         populate_by_name = True
+
+#========================================================
+# 4. [Inner Model] 원본 자막 한 줄 (Youtube API 반환값 대응)
+#========================================================
+
+class ScriptItem(BaseModel):
+    text: str       # 자막 내용
+    start: float    # 시작 시간 (초)
+    duration: float # 지속 시간 (초)
