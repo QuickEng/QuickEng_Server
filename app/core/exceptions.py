@@ -1,5 +1,10 @@
 # app/core/exceptions.py
 
+# 가장 먼저 부모 클래스(뼈대)를 정의합니다.
+class BusinessException(Exception):
+    def __init__(self, detail: str, status_code: int = 400):
+        self.detail = detail
+        self.status_code = status_code
 # ... (기존 BusinessException, NoTranscriptException 등 아래에 추가) ...
 
 # 1. AI 응답이 JSON 형식이 아닐 때 (파싱 에러)
