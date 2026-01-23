@@ -44,27 +44,13 @@ class WordItem(BaseModel):
 # 3. [응답] 서버가 앱에게 줄 때 ("자, 여기 분석 결과야!")
 # =========================================================
 class AnalyzeResponse(BaseModel):
-    # 파이썬: video_id <---> 앱: videoId
     video_id: str = Field(..., alias="videoId")
-    
     title: str
+    #thumbnail_url: str = Field(..., alias="thumbnailUrl")
     
-    # 파이썬: thumbnail_url <---> 앱: thumbnailUrl
-    thumbnail_url: str = Field(..., alias="thumbnailUrl")
-    
-    # ★ 제일 중요 ★
-    # 파이썬: script_items (리스트) <---> 앱: scriptItems (리스트)
-    # 위에서 만든 'ScriptItem' 모양의 데이터들이 줄줄이 들어갑니다.
-    script_items: List[ScriptItem] = Field(..., alias="scriptItems")
+    # ★ 핵심 수정: 명세서의 scriptItems에는 단어장(WordItem)이 들어갑니다.
+    script_items: List[WordItem] = Field(..., alias="scriptItems")
 
     class Config:
         populate_by_name = True
 
-#========================================================
-# 4. [Inner Model] 원본 자막 한 줄 (Youtube API 반환값 대응)
-#========================================================
-
-class ScriptItem(BaseModel):
-    text: str       # 자막 내용
-    start: float    # 시작 시간 (초)
-    duration: float # 지속 시간 (초)

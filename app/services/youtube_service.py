@@ -41,6 +41,7 @@ def extract_video_id(url: str) -> str:
     raise InvalidLinkException()
 
 
+
 def _fetch_transcript_sync(video_id: str):
     """
     [동기 함수] 실제 자막을 다운로드합니다.
@@ -82,6 +83,8 @@ async def get_transcript_list(video_url: str, language: str = "en") -> list[dict
         transcript_data = await asyncio.to_thread(_fetch_transcript_sync, video_id)
         
         return transcript_data
+
+
     
     # --- [에러 처리 구간] ---
     

@@ -8,6 +8,11 @@ from app.models.schemas import AnalyzeRequest, AnalyzeResponse, ScriptItem, Word
 from app.services.youtube_service import get_transcript_list 
 from app.services.gemini_service import extract_vocabulary
 
+#extract_video_id 임포트
+from app.services.youtube_service import extract_video_id
+
+
+
 # 커스텀 에러 임포트 (InvalidLinkException 포함 확인!)
 from app.core.exceptions import (
     NoTranscriptException,
@@ -28,23 +33,30 @@ async def analyze_video(request: AnalyzeRequest):
     2. 단어장 생성 (Gemini)
     """
     try:
-        # 1. 자막 추출 (YouTube Service)
+
+        # 1. URL에서 Video ID 추출
+        video_id = extract_video_id(request.video_url)
+
+        # 2. 자막 추출 (YouTube Service)
         # 반환값: [{'text': 'Hello', 'start': 0.0, 'duration': 1.5}, ...]
         transcript_data = await get_transcript_list(str(request.video_url), request.language)
         
-        # 2. 핵심 표현 추출 (Gemini Service)
+        # 3. 핵심 표현 추출 (Gemini Service)
         # 반환값: [{'id': '...', 'expression': '...', 'meaningKr': '...', 'contextTag': '...'}, ...]
         vocabulary_data = await extract_vocabulary(transcript_data)
         
-        # 3. Pydantic 모델로 변환 (데이터 검증)
-        script_items = [ScriptItem(**item) for item in transcript_data]
+        # 4. Pydantic 모델로 변환 (데이터 검증)
         word_items = [WordItem(**item) for item in vocabulary_data]
+
+        # 4. url의 id추출
+        #url_id = extract_video_id(str(request.video_url))
         
-        # 4. 최종 응답 생성
+        # 5. 최종 응답 생성
         return AnalyzeResponse(
-            video_url=request.video_url,
-            script=script_items,
-            words=word_items
+            video_id=video_id,
+            title="uploaded_url",
+            #thumbnail_url=str(request.video_url),
+            script_items=word_items  # API 명세서의 scriptItems 키에 매핑됨
         )
 
     # =========================================================
