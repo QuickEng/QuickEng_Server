@@ -48,7 +48,7 @@ def _fetch_transcript_sync(video_id: str):
     ★ 중요: 영어 학습 앱이므로 '영어 자막'이 없으면 에러 처리합니다.
     """
     try:
-        transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+        transcript_list = YouTubeTranscriptApi().list(video_id)
         
         # [수정 포인트]
         # 사용자가 요청한 언어(targetLang)와 상관없이, 
@@ -97,4 +97,4 @@ async def get_transcript_list(video_url: str, language: str = "en") -> list[dict
     # CASE 2: 정말 예상치 못한 시스템 에러
     except Exception as e:
         logger.error(f"YouTube 추출 치명적 오류: {str(e)}")
-        raise YouTubeUnknownException()
+        raise YouTubeUnknownException(debug_message=str(e))

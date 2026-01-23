@@ -2,8 +2,11 @@
 
 # 가장 먼저 부모 클래스(뼈대)를 정의합니다.
 class BusinessException(Exception):
-    def __init__(self, detail: str, status_code: int = 400):
-        self.detail = detail
+    # [수정] detail, code, status_code 외에 message도 받을 수 있게 수정
+    def __init__(self, detail: str = None, code: str = "ERROR", status_code: int = 400, message: str = None):
+        # detail이 있으면 쓰고, 없으면 message를 쓰고, 둘 다 없으면 기본 문구 사용
+        self.detail = detail or message or "알 수 없는 오류가 발생했습니다."
+        self.code = code
         self.status_code = status_code
 # ... (기존 BusinessException, NoTranscriptException 등 아래에 추가) ...
 
@@ -18,6 +21,9 @@ class AIParseException(BusinessException):
 # 2. 그 외 알 수 없는 에러 (서버 내부 오류)
 class AIUnknownException(BusinessException):
     def __init__(self, debug_message: str = ""):
+        # [추가] 여기도 동일하게 추가
+        self.debug_message = debug_message
+
         # debug_message는 로그용으로 받아두되, 클라이언트에게는 안전한 메시지만 보냄
         super().__init__(
             code="UNKNOWN_ERROR",
@@ -50,6 +56,9 @@ class TranscriptsDisabledException(BusinessException):
 # 5. 알 수 없는 유튜브 에러 (네트워크 문제, IP 차단 등)
 class YouTubeUnknownException(BusinessException):
     def __init__(self, debug_message: str = ""):
+        # [추가] 받아온 디버그 메시지를 변수에 저장해둡니다.
+        self.debug_message = debug_message
+
         super().__init__(
             code="YOUTUBE_ERROR",
             message="유튜브 자막을 가져오는 중 오류가 발생했습니다."

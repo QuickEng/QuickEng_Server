@@ -41,12 +41,20 @@ async def extract_vocabulary(transcript_list: list[dict]) -> list[dict]:
         # 1. 텍스트 전처리 (Preprocessing)
         # ---------------------------------------------------------
         # 자막 리스트에서 텍스트만 추출하여 하나의 긴 문자열로 병합
-        full_text = " ".join([item["text"] for item in transcript_list])
+        texts = []
+        for item in transcript_list:
+            if isinstance(item, dict):
+                texts.append(item.get("text", ""))
+            else:
+                # 객체(FetchedTranscriptSnippet)일 경우 .text로 접근
+                texts.append(getattr(item, "text", ""))
+        
+        full_text = " ".join(texts)
         
         # ---------------------------------------------------------
         # 2. 모델 선택 (Model Initialization)
         # ---------------------------------------------------------
-        model = genai.GenerativeModel("gemini-pro")
+        model = genai.GenerativeModel("gemini-2.5-flash")
         
         # ---------------------------------------------------------
         # 3. 프롬프트 구성 (Prompt Engineering)
@@ -119,4 +127,4 @@ async def extract_vocabulary(transcript_list: list[dict]) -> list[dict]:
         logger.error(f"Gemini API 알 수 없는 오류: {str(e)}")
         
         # [응답] 앱용: "UNKNOWN_ERROR" 표준 에러 던지기
-        raise AIUnknownException()
+        raise AIUnknownException(debug_message=str(e))

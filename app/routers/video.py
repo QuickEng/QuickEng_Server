@@ -39,7 +39,7 @@ async def analyze_video(request: AnalyzeRequest):
 
         # 2. 자막 추출 (YouTube Service)
         # 반환값: [{'text': 'Hello', 'start': 0.0, 'duration': 1.5}, ...]
-        transcript_data = await get_transcript_list(str(request.video_url), request.language)
+        transcript_data = await get_transcript_list(str(request.video_url), request.target_lang)
         
         # 3. 핵심 표현 추출 (Gemini Service)
         # 반환값: [{'id': '...', 'expression': '...', 'meaningKr': '...', 'contextTag': '...'}, ...]
@@ -92,10 +92,17 @@ async def analyze_video(request: AnalyzeRequest):
         )
     
     # 5. 기타 서버 에러 (500)
+    #except (YouTubeUnknownException, AIUnknownException) as e:
+     #   return JSONResponse(
+      #      status_code=500,
+       #     content={"code": "SERVER_ERROR", "message": "서버 내부 로직 오류가 발생했습니다."}
+        #)
+    # ▼ 디버깅용 임시 코드 (에러 내용을 화면에 보여줌) ▼
     except (YouTubeUnknownException, AIUnknownException) as e:
         return JSONResponse(
             status_code=500,
-            content={"code": "SERVER_ERROR", "message": "서버 내부 로직 오류가 발생했습니다."}
+            # str(e) 대신 e.debug_message를 출력!
+            content={"code": "DEBUG_ERROR", "message": f"진짜 에러 내용: {e.debug_message}"} 
         )
         
     except Exception as e:
