@@ -2,9 +2,14 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
+from dotenv import load_dotenv
 # [수정] 라우터 임포트는 맨 위로 올리는 것이 정석입니다.
 from app.routers import video 
+
+
+
+# 서버 시작할 때 .env 파일을 읽어옴
+load_dotenv()
 
 app = FastAPI(
     title="QuickEng Server",
