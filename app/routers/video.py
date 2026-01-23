@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
-from app.models.schemas import AnalyzeRequest, AnalyzeResponse, ScriptItem, WordItem
+from app.models.schemas import AnalyzeRequest, AnalyzeResponse, WordItem
 
 # 서비스 로직 임포트
 from app.services.youtube_service import get_transcript_list 
